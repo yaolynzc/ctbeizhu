@@ -56,3 +56,55 @@ exports.register = function(req,res){
 		});
 	});
 }
+
+//5.3 修改用户信息updateuser
+//get(/updateuser?uid=&pwd=&nickname=&pic=)
+exports.updateuser = function(req,res){
+	sql.connect(config).then(function(){
+		var request = new sql.Request();
+		request.input('name',sql.NVarChar(50),req.query.uid);
+
+		var querystr = 'update tb_user set ';
+		if(req.query.pwd){
+			request.input('pwd',sql.NVarChar(50),md5js.hex_md5(req.query.pwd));
+			querystr += 'pwd=@pwd '
+		}
+		if(req.query.nickname){
+			request.input('nickname',sql.NVarChar(50),req.query.nickname);
+			querystr += 'nickname=@nickname ';
+		}
+		if(req.query.pic){
+			request.input('pic',sql.NVarChar(200),'\\upload\\user\\'+req.query.pic);
+			querystr += 'pic=@pic ';
+		}
+		querystr += ' where name=@name '
+		// console.log(querystr);
+		request.query(querystr).then(function(){
+			// res.send({
+			// 	success:true
+			// })
+			var request2 = new sql.Request();
+			request2.input('name',sql.NVarChar(50),req.query.uid);
+			request2.query('select * from tb_user where name=@name ').then(function(recordset){
+				res.send({
+					success:true,
+					user:recordset
+				});
+			}).catch(function(err){
+				console.log(err);
+				res.statusCode = 503;
+				res.send({
+					success:false,
+					msg:err
+				})
+			});
+		}).catch(function(err){
+			console.log(err);
+			res.statusCode = 503;
+			res.send({
+				success:false,
+				msg:err
+			})
+		});
+	})
+}
