@@ -2,9 +2,8 @@ var express = require('express');
 var services = require('./routes/services');
 var app = express();
 
-app.get('/login/:uid/:pwd',services.login);
-app.get('/register/:uid/:pwd',services.register);
-app.get('/updateuser/',services.updateuser);
+app.get('/addbeizhu',services.addbeizhu);
+app.get('/addbeizhu2',services.addbeizhu2);
 
-app.listen(8088);
-console.log('rest api listening on port 8088');
+app.listen(2388);
+console.log('chutian beizhu services start listening on port 2388 \r\n');
